@@ -4,10 +4,13 @@ from openpyxl.worksheet.worksheet import Worksheet
 
 def getValores_Col(
         letraCol: str, 
-        sheet: Worksheet):
+        sheet: Worksheet,
+        linhaInicio: str,
+        linhaFim: str):
     
     coluna_escolhida = \
-        [cell[0].value for cell in sheet[f'{letraCol}7':f'{letraCol}199']]
+        [cell[0].value for cell in 
+         sheet[f'{letraCol}{linhaInicio}':f'{letraCol}{linhaFim}']]
     return coluna_escolhida
 
 
@@ -31,9 +34,12 @@ def turnIntoDf(
 def reorganizeColumn(
         letraCol: str, 
         cabecalho: list, 
-        sheet_excel: Worksheet):
+        sheet_excel: Worksheet,
+        linhaInicio: str,
+        linhaFim: str):
     
-    arrayVls = getValores_Col(letraCol, sheet_excel)
+    arrayVls = getValores_Col(
+        letraCol, sheet_excel, linhaInicio, linhaFim)
     listaDividida = setListaDeListas(arrayVls)
     return turnIntoDf(listaDividida, cabecalho)
 
@@ -55,28 +61,28 @@ def buildColunaPreenchida(
         columns=[vlHeaderColuna])
 
 
-def merge_total_governo_privado_tpArmazem_dt_registro(
+def merge_dfTotal_dfGoverno_dfPrivado_mais_tpArmazem_dt_registro(
         dfA: pd.DataFrame, 
         dfB: pd.DataFrame, 
         dfC: pd.DataFrame,
-        tp_armazens_typed: str,
-        vl_coluna_armazens: str,
-        tp_armazens_typed2: str,
-        desc_semestre_ano: str,
+        nm_header_ctg_armazem: str,
+        vl_preenchedor_coluna_armazens: str,
+        nm_header_dt_registro: str,
+        vl_preenchedor_semestre_ano: str,
         df_base: pd.DataFrame):
     
     join1 = concatenarDfs(dfA, dfB)
     join2 = concatenarDfs(join1, dfC)
     
     df_ctg_armazens = buildColunaPreenchida(
-        tp_armazens_typed, 
-        vl_coluna_armazens, 
+        nm_header_ctg_armazem, 
+        vl_preenchedor_coluna_armazens, 
         df_base)
     
     join3 = concatenarDfs(join2, df_ctg_armazens)
     df_semestre_ano = buildColunaPreenchida(
-        tp_armazens_typed2, 
-        desc_semestre_ano, 
+        nm_header_dt_registro, 
+        vl_preenchedor_semestre_ano, 
         df_base)
     
     join4 = concatenarDfs(join3, df_semestre_ano)
